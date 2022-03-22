@@ -2,6 +2,8 @@ node_modules
 .cache
 dashboard/*.js
 dashboard/*.js.map
+dashboard/*.css
+dashboard/*.css.map
 dashboard/*.html
 .DS_Store
 package-lock.json
