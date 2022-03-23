@@ -1,0 +1,104 @@
+$primary: #25439c;
+$secondary: #8f8f8f;
+$info: #13101c;
+$warning: #945707;
+$danger: #d62518;
+$light: #f8f9fa;
+$dark: #343a40;
+$light-cg: #525f78;
+
+$custom-colors: (
+  primary: $primary,
+  secondary: $secondary,
+  info: $info,
+  warning: $warning,
+  danger: $danger,
+  light: $light,
+  dark: $dark,
+  // add any additional color below
+);
+$body-color: #e3e5e9;
+
+@import "~bootstrap/scss/bootstrap.scss";
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
+$popover-arrow-color: $light-cg;
+
+.popover {
+  background-color: $light-cg;
+}
+
+// for the arrow on the bottom to be the same color
+.bs-popover-top > .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^="top"] > .popover-arrow::after {
+  border-top-color: $light-cg;
+}
+
+.card {
+  flex-direction: row;
+}
+.card img {
+  /* width: 30%; */
+  margin: 0 0 0 0;
+  border: 0;
+}
+
+.card {
+  background-color: #3e4661;
+  align-items: center;
+}
+.card-title {
+  font-weight: bold;
+}
+.card img {
+  border-top-right-radius: 0;
+  border-top-left-radius: calc(0.25rem - 1px);
+  border-bottom-left-radius: calc(0.25rem - 1px);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.drop-pop {
+  position: relative;
+  left: 30px;
+  top: 3px;
+}
+
+.drop-btn {
+  position: absolute;
+  left: 673px;
+  top: 146px;
+}
+
+.popout-link {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 10px;
+  left: 780px;
+  color: $body-color;
+  transition: color 0.2s ease-out, background 0.2s ease-in;
+}
+
+.popout-link:hover {
+  color: rgb(82, 163, 218);
+  cursor: pointer;
+}
+
+.popout-icon {
+  position: relative;
+  stroke-width: 1px;
+  overflow: overlay;
+  display: block;
+  margin: auto;
+  top: 2px;
+}
+
+.playback-info {
+  position: relative;
+  top: 11px;
+}

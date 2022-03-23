@@ -1,6 +1,5 @@
 import "regenerator-runtime/runtime";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./index.css";
+import "./index.scss";
 
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
@@ -19,6 +18,7 @@ import {
   Badge,
   Modal,
 } from "react-bootstrap";
+import { BsBoxArrowUpRight } from "react-icons/bs";
 
 const apiUrl = "your api url";
 const rtmpUrl = "your rtmp url";
@@ -94,45 +94,26 @@ const CopyStreamInfo = ({ stream, ...props }) => {
   const [variant, setVariant] = useState("primary");
   const [text, setText] = useState("Stream Info");
 
-  const copyFunc = (region) => {
-    const infoString = `Stream url: \`rtmp://${region}.${rtmpUrl}/live/\` \nStream key: \`${stream.name}?streamkey=${stream.stream_key}\``;
-    navigator.clipboard.writeText(infoString);
-    setVariant("success");
-    setText("Copied");
-    setTimeout(() => {
-      setVariant("primary");
-      setText("Stream Info");
-    }, 3000);
+  const getInfo = (region) => {
+    return `Stream url: \`rtmp://${region}.${rtmpUrl}/live/\` \nStream key: \`${stream.name}?streamkey=${stream.stream_key}\``;
   };
   return (
-    <DropdownButton
+    <ButtonGroup
       variant={variant}
       title={text}
       as={ButtonGroup}
       style={{ ...props.style }}
     >
-      <Dropdown.Item
-        onClick={() => {
-          copyFunc("us");
-        }}
-      >
+      <CopyButton stream={stream} text={getInfo("us")}>
         US
-      </Dropdown.Item>
-      <Dropdown.Item
-        onClick={() => {
-          copyFunc("eu");
-        }}
-      >
+      </CopyButton>
+      <CopyButton stream={stream} text={getInfo("eu")}>
         EU
-      </Dropdown.Item>
-      <Dropdown.Item
-        onClick={() => {
-          copyFunc("sg");
-        }}
-      >
+      </CopyButton>
+      <CopyButton stream={stream} text={getInfo("sg")}>
         SG
-      </Dropdown.Item>
-    </DropdownButton>
+      </CopyButton>
+    </ButtonGroup>
   );
 };
 
@@ -159,19 +140,18 @@ const DropButton = ({ stream, ...props }) => {
     setShowPop(false);
   };
   const popover = (
-    <Popover id="popover-basic">
-      <Popover.Header as="h3">Popover right</Popover.Header>
+    <Popover id="popover-basic" style={{}}>
       <Popover.Body>
         <Form.Check
           type="checkbox"
-          label={`Change stream key`}
+          label={`Change stream \nkey`}
           defaultChecked={changeKey}
           onChange={(e) => {
             console.log(e.target.checked);
             setChangeKey(e.target.checked);
           }}
         ></Form.Check>
-        <Button type="submit" onClick={handleSubmit}>
+        <Button type="submit" className="drop-pop" onClick={handleSubmit}>
           Confirm
         </Button>
       </Popover.Body>
@@ -186,8 +166,8 @@ const DropButton = ({ stream, ...props }) => {
         <Col></Col>
         <Col>
           <OverlayTrigger
-            trigger="click"
-            placement="right"
+            trigger={["click"]}
+            placement="top"
             overlay={popover}
             show={showPop}
             onToggle={() => {
@@ -195,7 +175,9 @@ const DropButton = ({ stream, ...props }) => {
               if (!showPop) setChangeKey(true);
             }}
           >
-            <Button variant="danger">Drop Stream</Button>
+            <Button variant="danger" className="drop-btn">
+              Drop Stream
+            </Button>
           </OverlayTrigger>
         </Col>
       </Row>
@@ -203,21 +185,45 @@ const DropButton = ({ stream, ...props }) => {
   );
 };
 
+const StreamPopout = ({ stream, ...props }) => {
+  const openWindow = () => {
+    if (stream.live_stream)
+      window.open(props.watchLink, "steve", "height=720,width=1280");
+  };
+  return (
+    <>
+      {stream.live_stream ? (
+        <span className="popout-link" onClick={openWindow}>
+          <BsBoxArrowUpRight className="popout-icon"></BsBoxArrowUpRight>
+        </span>
+      ) : (
+        <></>
+      )}
+    </>
+  );
+};
+
 const StreamInfo = ({ stream, ...props }) => {
   const { image, isLive } = useThumbnail(stream);
   const [watchLink, setWatchLink] = useState();
+  const [rtmpLink, setRtmpLink] = useState();
 
   useEffect(() => {
-    if (isLive)
+    if (isLive) {
       setWatchLink(
         `https://${stream.live_stream.region}.${rtmpUrl}/?watch=${stream.name}`
       );
+      setRtmpLink(
+        `rtmp://${stream.live_stream.region}.${rtmpUrl}/live/${stream.name}`
+      );
+    }
   }, [stream]);
 
   console.log(stream);
   return (
     <Card
       style={{ height: 200, flexDirection: "row", margin: "2% 0% 2% 0%" }}
+      className="stream-info"
       flex
     >
       <Card.Img variant="left" src={image} style={{ height: "100%" }} />
@@ -226,17 +232,29 @@ const StreamInfo = ({ stream, ...props }) => {
           ? `Live: ${stream.live_stream.region.toUpperCase()}`
           : "offline"}
       </Badge>
+      <DropButton stream={stream}></DropButton>
+      <StreamPopout stream={stream} watchLink={watchLink} />
       <Card.Body>
         <Card.Title>Stream Name: {stream.name}</Card.Title>
         <Card.Text>Stream Key: {stream.stream_key}</Card.Text>
-        Copy:
-        <ButtonGroup>
-          <CopyStreamInfo stream={stream}>Drop Down</CopyStreamInfo>
-          <CopyButton stream={stream} isActive={isLive} text={watchLink}>
-            Watch Link
-          </CopyButton>
-        </ButtonGroup>
-        <DropButton stream={stream}></DropButton>
+        <span>
+          Info:
+          <ButtonGroup>
+            <CopyStreamInfo stream={stream}>Drop Down</CopyStreamInfo>
+          </ButtonGroup>
+        </span>
+        <br />
+        <span className="playback-info">
+          Playback:
+          <ButtonGroup>
+            <CopyButton stream={stream} isActive={isLive} text={watchLink}>
+              Browser
+            </CopyButton>
+            <CopyButton stream={stream} isActive={isLive} text={rtmpLink}>
+              RTMP
+            </CopyButton>
+          </ButtonGroup>
+        </span>
       </Card.Body>
     </Card>
   );
@@ -280,12 +298,6 @@ ReactDOM.render(
       src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js"
       crossOrigin="true"
     ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-      crossOrigin="anonymous"
-    />
     <App></App>
   </>,
   root
