@@ -20,8 +20,12 @@ import {
 } from "react-bootstrap";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 
-const apiUrl = "your api url";
-const rtmpUrl = "your rtmp url";
+const apiUrl = process.env.API;
+const rtmpUrl = process.env.RTMP;
+
+if (!apiUrl || !rtmpUrl) {
+  throw new Error("API or RTMP URL is missing!");
+}
 
 const fetcher = (url) =>
   fetch(url, {

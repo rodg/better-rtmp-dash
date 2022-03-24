@@ -7,3 +7,4 @@ dashboard/*.css.map
 dashboard/*.html
 .DS_Store
 package-lock.json
+.env
