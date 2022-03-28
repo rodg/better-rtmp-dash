@@ -56,7 +56,9 @@ const StreamInfo = ({ stream, ...props }) => {
       <StreamPopout stream={stream} watchLink={watchLink} />
       <Card.Body>
         <Card.Title>Stream Name: {stream.name}</Card.Title>
-        <Card.Text>Stream Key: {stream.stream_key}</Card.Text>
+        <Card.Text>
+          Stream Key: {`${stream.name}?streamkey=${stream.stream_key}`}
+        </Card.Text>
         <span>
           Info:
           <ButtonGroup>
